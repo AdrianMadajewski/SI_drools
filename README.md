@@ -1,4 +1,4 @@
-Projekt zaliczeniowy z przedmiotu Sztuczna Inteligencja - system regułowy [Drools]
+# Projekt zaliczeniowy z przedmiotu Sztuczna Inteligencja - system regułowy [Drools]
 
 Adrian Madajewski 145406
 
