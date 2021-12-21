@@ -1,0 +1,2135 @@
+package com.sample
+import javax.swing.JOptionPane
+import javax.swing.JFrame
+import org.kie.api.runtime.KieRuntime
+import javax.swing.JRadioButton
+import javax.swing.JPanel
+import java.util.List
+import java.util.Arrays;
+import java.util.ArrayList
+import javax.swing.JLabel;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.ArrayList
+
+global JFrame frame
+
+function void recommend(JFrame frame, KieRuntime krt, String recommended) {
+    final JPanel panel = new JPanel();
+    panel.add(new JLabel(recommended));
+    JOptionPane.showMessageDialog(frame, panel);
+}
+
+function Answer ask(JFrame frame, KieRuntime krt, String contest, ArrayList answers) {
+
+    class Listener implements ItemListener {
+        private Answer answer;
+        private String chosen;
+        public Listener(Answer _answer, String _chosen) {
+            this.answer = _answer;
+            this.chosen = _chosen;
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent event) {
+            if (event.getStateChange() == ItemEvent.SELECTED) {
+                answer.setAnswer(chosen);
+            }
+        }
+    }
+    
+    Answer answer = new Answer(contest, (String) answers.get(0));
+
+    final JPanel panel = new JPanel(new GridLayout(0, 1));
+    panel.add(new JLabel(contest));
+
+    ArrayList < JRadioButton > buttons = new ArrayList < > ();
+
+    for (int i = 0; i < answers.size(); i++) {
+        String text = (String) answers.get(i);
+        JRadioButton radio = new JRadioButton(text);
+        radio.addItemListener(new Listener(answer, text));
+        buttons.add(radio);
+    }
+
+    buttons.get(0).setSelected(true);
+    answer.setAnswer((String) answers.get(0));
+
+    ButtonGroup group = new ButtonGroup();
+   	for(JRadioButton button : buttons) {
+        group.add(button);
+        panel.add(button);
+    }
+   
+    if (JOptionPane.showConfirmDialog(frame, panel, "Question", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE) < 0) {
+        answer.setAnswer("The End!");
+    }
+
+    return answer;
+}
+
+declare Answer
+	question : String
+	answer : String
+end
+
+rule "I want to buy a game!"
+    when
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("I'm looking for a Filer or Party Game");
+    options.add("A stategy game");
+    options.add("I want a Wargame");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "I want to buy a game!", options);
+    insert (answer);
+end
+
+rule "I want to buy a game! - I'm looking for a Filer or Party Game - Are you playing with Geeks?"
+    when
+    Answer(question == "I want to buy a game!" && answer == "I'm looking for a Filer or Party Game")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Are you playing with Geeks?", options);
+    insert (answer);
+end
+
+rule "Are you playing with Geeks? - Yes - Roling dice, or a bluffing game?"
+    when
+    Answer(question == "Are you playing with Geeks?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Dice");
+    options.add("Bluffing");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Roling dice, or a bluffing game?", options);
+    insert (answer);
+end
+
+rule "Roling dice, or a bluffing game? - Dice - Are you a zombie or a giant monster?"
+    when
+    Answer(question == "Roling dice, or a bluffing game?" && answer == "Dice")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Zombie");
+    options.add("Giant Monster");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Are you a zombie or a giant monster?", options);
+    insert (answer);
+end
+
+rule "Are you a zombie or a giant monster? - Zombie - You've chosen Dice!"
+    when
+    Answer(question == "Are you a zombie or a giant monster?" && answer == "Zombie")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "You've chosen Dice!");
+end
+
+
+rule "Are you a zombie or a giant monster? - Giant Monster - King of Tokyo would best suit you!"
+    when
+    Answer(question == "Are you a zombie or a giant monster?" && answer == "Giant Monster")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "King of Tokyo would best suit you!");
+end
+
+
+rule "Roling dice, or a bluffing game? - Bluffing - Cooperative or Competitive?"
+    when
+    Answer(question == "Roling dice, or a bluffing game?" && answer == "Bluffing")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Competitive");
+    options.add("Cooperative");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Cooperative or Competitive?", options);
+    insert (answer);
+end
+
+rule "Cooperative or Competitive? - Competitive - Coup!"
+    when
+    Answer(question == "Cooperative or Competitive?" && answer == "Competitive")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Coup!");
+end
+
+
+rule "Cooperative or Competitive? - Cooperative - The resistance!"
+    when
+    Answer(question == "Cooperative or Competitive?" && answer == "Cooperative")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "The resistance!");
+end
+
+
+rule "Are you playing with Geeks? - No - Do you like trivia?"
+    when
+    Answer(question == "Are you playing with Geeks?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do you like trivia?", options);
+    insert (answer);
+end
+
+rule "Do you like trivia? - Yes - Wits & Wagers"
+    when
+    Answer(question == "Do you like trivia?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Wits & Wagers");
+end
+
+
+rule "Do you like trivia? - No - How about something creative?"
+    when
+    Answer(question == "Do you like trivia?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Sure");
+    options.add("Nope");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about something creative?", options);
+    insert (answer);
+end
+
+rule "How about something creative? - Sure - Working with words or pictures?"
+    when
+    Answer(question == "How about something creative?" && answer == "Sure")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Words");
+    options.add("Pictures");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Working with words or pictures?", options);
+    insert (answer);
+end
+
+rule "Working with words or pictures? - Words - Apples to Apples"
+    when
+    Answer(question == "Working with words or pictures?" && answer == "Words")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Apples to Apples");
+end
+
+
+rule "Working with words or pictures? - Pictures - Dixit"
+    when
+    Answer(question == "Working with words or pictures?" && answer == "Pictures")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dixit");
+end
+
+
+rule "How about something creative? - Nope - How about a deduction game?"
+    when
+    Answer(question == "How about something creative?" && answer == "Nope")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Hanabi");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about a deduction game?", options);
+    insert (answer);
+end
+
+rule "How about a deduction game? - Hanabi - You've chosen Hanabi!"
+    when
+    Answer(question == "How about a deduction game?" && answer == "Hanabi")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "You've chosen Hanabi!");
+end
+
+
+rule "I want to buy a game! - A stategy game - Does theme matter to you?"
+    when
+    Answer(question == "I want to buy a game!" && answer == "A stategy game")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Does theme matter to you?", options);
+    insert (answer);
+end
+
+rule "Does theme matter to you? - Yes - What's your favourite theme?"
+    when
+    Answer(question == "Does theme matter to you?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("City building");
+    options.add("Horror");
+    options.add("Fantasy");
+     options.add("Science Fiction");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "What's your favourite theme?", options);
+    insert (answer);
+end
+
+rule "Does theme matter for you? - Yes - What's your favourite theme?"
+    when
+    Answer(question == "Does theme matter for you?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Science Fiction");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "What's your favourite theme?", options);
+    insert (answer);
+end
+
+rule "What's your favourite theme? - Science Fiction - Star Wars fan?"
+    when
+    Answer(question == "What's your favourite theme?" && answer == "Science Fiction")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No");
+    options.add("Yes");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Star Wars fan?", options);
+    insert (answer);
+end
+
+rule "Star Wars fan? - No - Star Trek, then?"
+    when
+    Answer(question == "Star Wars fan?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Star Trek, then?", options);
+    insert (answer);
+end
+
+rule "Star Trek, then? - Yes - 1 vs 1 or working togeher?"
+    when
+    Answer(question == "Star Trek, then?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("1 vs 1");
+    options.add("Teamplay");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "1 vs 1 or working togeher?", options);
+    insert (answer);
+end
+
+rule "1 vs 1 or working togeher? - 1 vs 1 - Star Trek: Fleet Captains"
+    when
+    Answer(question == "1 vs 1 or working togeher?" && answer == "1 vs 1")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Star Trek: Fleet Captains");
+end
+
+
+rule "1 vs 1 or working togeher? - Teamplay - Star Trek Expeditions"
+    when
+    Answer(question == "1 vs 1 or working togeher?" && answer == "Teamplay")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Star Trek Expeditions");
+end
+
+
+rule "Star Trek, then? - No - Battlestar Galactica?"
+    when
+    Answer(question == "Star Trek, then?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Battlestar Galactica?", options);
+    insert (answer);
+end
+
+rule "Battlestar Galactica? - Yes - Battlestar Galactica: The Board Game"
+    when
+    Answer(question == "Battlestar Galactica?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Battlestar Galactica: The Board Game");
+end
+
+
+rule "Battlestar Galactica? - No - Explore, Expand, Exploit and Exterminate?"
+    when
+    Answer(question == "Battlestar Galactica?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Of course!");
+    options.add("That's not right!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Explore, Expand, Exploit and Exterminate?", options);
+    insert (answer);
+end
+
+rule "Explore, Expand, Exploit and Exterminate? - Of course! - So, just how epic are we getting?"
+    when
+    Answer(question == "Explore, Expand, Exploit and Exterminate?" && answer == "Of course!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("We've got all day");
+    options.add("It is a work night..");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "So, just how epic are we getting?", options);
+    insert (answer);
+end
+
+rule "So, just how epic are we getting? - We've got all day - Twilight Imperium: 3rd Edition"
+    when
+    Answer(question == "So, just how epic are we getting?" && answer == "We've got all day")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Twilight Imperium: 3rd Edition");
+end
+
+
+rule "So, just how epic are we getting? - It is a work night.. - Eclipse"
+    when
+    Answer(question == "So, just how epic are we getting?" && answer == "It is a work night..")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Eclipse");
+end
+
+
+rule "Explore, Expand, Exploit and Exterminate? - That's not right! - How about being an alien race?"
+    when
+    Answer(question == "Explore, Expand, Exploit and Exterminate?" && answer == "That's not right!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Maybe not");
+    options.add("That sounds fun");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about being an alien race?", options);
+    insert (answer);
+end
+
+rule "How about being an alien race? - Maybe not - How about a card game? Hmm"
+    when
+    Answer(question == "How about being an alien race?" && answer == "Maybe not")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Sure, that works");
+    options.add("I like my boards");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about a card game? Hmm", options);
+    insert (answer);
+end
+
+rule "How about a card game? Hmm - Sure, that works - A deck builder?"
+    when
+    Answer(question == "How about a card game? Hmm" && answer == "Sure, that works")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "A deck builder?", options);
+    insert (answer);
+end
+
+rule "A deck builder? - Yes - Core Worlds"
+    when
+    Answer(question == "A deck builder?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Core Worlds");
+end
+
+
+rule "A deck builder? - No - A Living Card Game?"
+    when
+    Answer(question == "A deck builder?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "A Living Card Game?", options);
+    insert (answer);
+end
+
+rule "A Living Card Game? - Yes - Android: Netrunner"
+    when
+    Answer(question == "A Living Card Game?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Android: Netrunner");
+end
+
+
+rule "A Living Card Game? - No - Race for the Galaxy"
+    when
+    Answer(question == "A Living Card Game?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Race for the Galaxy");
+end
+
+
+rule "How about a card game? Hmm - I like my boards - If not an alien, I'll be a..."
+    when
+    Answer(question == "How about a card game? Hmm" && answer == "I like my boards")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Athlete");
+    options.add("Galactic Corporation");
+    options.add("Space Crew on a Mission");
+    options.add("Merchant");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "If not an alien, I'll be a...", options);
+    insert (answer);
+end
+
+rule "If not an alien, I'll be a... - Athlete - Dreadball: The Futuristic Sport Game"
+    when
+    Answer(question == "If not an alien, I'll be a..." && answer == "Athlete")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dreadball: The Futuristic Sport Game");
+end
+
+
+rule "If not an alien, I'll be a... - Galactic Corporation - Phantom League"
+    when
+    Answer(question == "If not an alien, I'll be a..." && answer == "Galactic Corporation")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Phantom League");
+end
+
+
+rule "If not an alien, I'll be a... - Space Crew on a Mission - How will you succeed?"
+    when
+    Answer(question == "If not an alien, I'll be a..." && answer == "Space Crew on a Mission")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Teamwork and high speed planing");
+    options.add("Teamwork and dexterity");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How will you succeed?", options);
+    insert (answer);
+end
+
+rule "How will you succeed? - Teamwork and high speed planing - Space Alert"
+    when
+    Answer(question == "How will you succeed?" && answer == "Teamwork and high speed planing")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Space Alert");
+end
+
+
+rule "How will you succeed? - Teamwork and dexterity - Space Cadets"
+    when
+    Answer(question == "How will you succeed?" && answer == "Teamwork and dexterity")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Space Cadets");
+end
+
+
+rule "If not an alien, I'll be a... - Merchant - Seriously?"
+    when
+    Answer(question == "If not an alien, I'll be a..." && answer == "Merchant")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("It's serious business");
+    options.add("Nah, we just want a giggle");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Seriously?", options);
+    insert (answer);
+end
+
+rule "Seriously? - It's serious business - Merchant of Venus"
+    when
+    Answer(question == "Seriously?" && answer == "It's serious business")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Merchant of Venus");
+end
+
+
+rule "Seriously? - Nah, we just want a giggle - Galaxy Trucker"
+    when
+    Answer(question == "Seriously?" && answer == "Nah, we just want a giggle")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Galaxy Trucker");
+end
+
+
+rule "How about being an alien race? - That sounds fun - Doing battle..."
+    when
+    Answer(question == "How about being an alien race?" && answer == "That sounds fun")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("In space");
+    options.add("Fot the Galactic Centre");
+    options.add("For Earth!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Doing battle...", options);
+    insert (answer);
+end
+
+rule "Doing battle... - In space - Cosmic Encounter"
+    when
+    Answer(question == "Doing battle..." && answer == "In space")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Cosmic Encounter");
+end
+
+
+rule "Doing battle... - Fot the Galactic Centre - Rex: Final Days of an Empire"
+    when
+    Answer(question == "Doing battle..." && answer == "Fot the Galactic Centre")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Rex: Final Days of an Empire");
+end
+
+
+rule "Doing battle... - For Earth! - Conquest of Planet Earth"
+    when
+    Answer(question == "Doing battle..." && answer == "For Earth!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Conquest of Planet Earth");
+end
+
+
+rule "Star Wars fan? - Yes - Grand adventure or tactical space combat?"
+    when
+    Answer(question == "Star Wars fan?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Adventure");
+    options.add("Pew! Pew!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Grand adventure or tactical space combat?", options);
+    insert (answer);
+end
+
+rule "Grand adventure or tactical space combat? - Adventure - Star Wars Living Card Game"
+    when
+    Answer(question == "Grand adventure or tactical space combat?" && answer == "Adventure")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Star Wars Living Card Game");
+end
+
+
+rule "Grand adventure or tactical space combat? - Pew! Pew! - Star Wars: X"
+    when
+    Answer(question == "Grand adventure or tactical space combat?" && answer == "Pew! Pew!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Star Wars: X");
+end
+
+rule "What's your favourite theme? - City building - Dou you enjoy tile placement?"
+    when
+    Answer(question == "What's your favourite theme?" && answer == "City building")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Dou you enjoy tile placement?", options);
+    insert (answer);
+end
+
+rule "Dou you enjoy tile placement? - Yes - Are you willing to deal with elections?"
+    when
+    Answer(question == "Dou you enjoy tile placement?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("It's the democratic way");
+    options.add("Nope. I just want to build");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Are you willing to deal with elections?", options);
+    insert (answer);
+end
+
+rule "Are you willing to deal with elections? - It's the democratic way - Urban Sprawl"
+    when
+    Answer(question == "Are you willing to deal with elections?" && answer == "It's the democratic way")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Urban Sprawl");
+end
+
+
+rule "Are you willing to deal with elections? - Nope. I just want to build - Suburbia"
+    when
+    Answer(question == "Are you willing to deal with elections?" && answer == "Nope. I just want to build")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Suburbia");
+end
+
+
+rule "Dou you enjoy tile placement? - No - Startting from scratch or urban renewal?"
+    when
+    Answer(question == "Dou you enjoy tile placement?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Let's build it up!");
+    options.add("Let's clean the streets!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Startting from scratch or urban renewal?", options);
+    insert (answer);
+end
+
+rule "Startting from scratch or urban renewal? - Let's build it up! - Urbanization"
+    when
+    Answer(question == "Startting from scratch or urban renewal?" && answer == "Let's build it up!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Urbanization");
+end
+
+
+rule "Startting from scratch or urban renewal? - Let's clean the streets! - Urbania"
+    when
+    Answer(question == "Startting from scratch or urban renewal?" && answer == "Let's clean the streets!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Urbania");
+end
+
+
+rule "What's your favourite theme? - Horror - What's your favorite monster?"
+    when
+    Answer(question == "What's your favourite theme?" && answer == "Horror")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Zombies");
+    options.add("Cthulu");
+    options.add("Classic Movie Monsters");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "What's your favorite monster?", options);
+    insert (answer);
+end
+
+rule "What's your favorite monster? - Zombies - Boards or Cards?"
+    when
+    Answer(question == "What's your favorite monster?" && answer == "Zombies")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Board game");
+    options.add("Card game");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Boards or Cards?", options);
+    insert (answer);
+end
+
+rule "Boards or Cards? - Board game - Survival of the Fittest or Zombies vs Humans?"
+    when
+    Answer(question == "Boards or Cards?" && answer == "Board game")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Surival of the Fittest");
+    options.add("Zombies vs. Humans");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Survival of the Fittest or Zombies vs Humans?", options);
+    insert (answer);
+end
+
+rule "Survival of the Fittest or Zombies vs Humans? - Surival of the Fittest - City of Horror"
+    when
+    Answer(question == "Survival of the Fittest or Zombies vs Humans?" && answer == "Surival of the Fittest")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "City of Horror");
+end
+
+
+rule "Survival of the Fittest or Zombies vs Humans? - Zombies vs. Humans - Does anyone want to play as the zombies?"
+    when
+    Answer(question == "Survival of the Fittest or Zombies vs Humans?" && answer == "Zombies vs. Humans")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("We're all humans here");
+    options.add("Sure! Braaaaains..");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Does anyone want to play as the zombies?", options);
+    insert (answer);
+end
+
+rule "Does anyone want to play as the zombies? - We're all humans here - Zombicide"
+    when
+    Answer(question == "Does anyone want to play as the zombies?" && answer == "We're all humans here")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Zombicide");
+end
+
+
+rule "Does anyone want to play as the zombies? - Sure! Braaaaains.. - Last Night on Earth"
+    when
+    Answer(question == "Does anyone want to play as the zombies?" && answer == "Sure! Braaaaains..")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Last Night on Earth");
+end
+
+
+rule "Boards or Cards? - Card game - Resident Evil Deckbuilding Game"
+    when
+    Answer(question == "Boards or Cards?" && answer == "Card game")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Resident Evil Deckbuilding Game");
+end
+
+
+rule "What's your favorite monster? - Cthulu - Ever wanted to play on his side?"
+    when
+    Answer(question == "What's your favorite monster?" && answer == "Cthulu")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Well, maybe a little...");
+    options.add("Side with Elder Gods? No! Humanity stands together");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Ever wanted to play on his side?", options);
+    insert (answer);
+end
+
+rule "Ever wanted to play on his side? - Well, maybe a little... - Mansions of Madness"
+    when
+    Answer(question == "Ever wanted to play on his side?" && answer == "Well, maybe a little...")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Mansions of Madness");
+end
+
+
+rule "Ever wanted to play on his side? - Side with Elder Gods? No! Humanity stands together - An epic investigation or a gateway game?"
+    when
+    Answer(question == "Ever wanted to play on his side?" && answer == "Side with Elder Gods? No! Humanity stands together")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("I want an epic!");
+    options.add("Gateway, please");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "An epic investigation or a gateway game?", options);
+    insert (answer);
+end
+
+rule "An epic investigation or a gateway game? - I want an epic! - Arkham Horror"
+    when
+    Answer(question == "An epic investigation or a gateway game?" && answer == "I want an epic!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Arkham Horror");
+end
+
+
+rule "An epic investigation or a gateway game? - Gateway, please - Elder Sign"
+    when
+    Answer(question == "An epic investigation or a gateway game?" && answer == "Gateway, please")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Elder Sign");
+end
+
+
+rule "What's your favorite monster? - Classic Movie Monsters - Card"
+    when
+    Answer(question == "What's your favorite monster?" && answer == "Classic Movie Monsters")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("I'll crush you!");
+    options.add("I'd rather be a detective");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Card", options);
+    insert (answer);
+end
+
+rule "Card - I'll crush you! - Nigthfall"
+    when
+    Answer(question == "Card" && answer == "I'll crush you!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Nigthfall");
+end
+
+
+rule "Card - I'd rather be a detective - Betrayal at House on the Hill"
+    when
+    Answer(question == "Card" && answer == "I'd rather be a detective")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Betrayal at House on the Hill");
+end
+
+
+rule "What's your favourite theme? - Fantasy - Do you want a dungean crawling adventure?"
+    when
+    Answer(question == "What's your favourite theme?" && answer == "Fantasy")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do you want a dungean crawling adventure?", options);
+    insert (answer);
+end
+
+rule "Do you want a dungean crawling adventure? - Yes - A serious one?"
+    when
+    Answer(question == "Do you want a dungean crawling adventure?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No");
+    options.add("Yes");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "A serious one?", options);
+    insert (answer);
+end
+
+rule "A serious one? - No - Munchkin"
+    when
+    Answer(question == "A serious one?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Munchkin");
+end
+
+
+rule "A serious one? - Yes - How many players?"
+    when
+    Answer(question == "A serious one?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Just the two of us");
+    options.add("More than two");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How many players?", options);
+    insert (answer);
+end
+
+rule "How many players? - Just the two of us - Crush or out"
+    when
+    Answer(question == "How many players?" && answer == "Just the two of us")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Fight");
+    options.add("Maneuver");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Crush or out", options);
+    insert (answer);
+end
+
+rule "Crush or out - Fight - Claustrophobia"
+    when
+    Answer(question == "Crush or out" && answer == "Fight")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Claustrophobia");
+end
+
+
+rule "Crush or out - Maneuver - Dungeon Twister 2: Prison"
+    when
+    Answer(question == "Crush or out" && answer == "Maneuver")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dungeon Twister 2: Prison");
+end
+
+
+rule "How many players? - More than two - Cooperative or Competitive?"
+    when
+    Answer(question == "How many players?" && answer == "More than two")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Coop");
+    options.add("Competition");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Cooperative or Competitive?", options);
+    insert (answer);
+end
+
+rule "Cooperative or Competitive? - Coop - Playing with kids?"
+    when
+    Answer(question == "Cooperative or Competitive?" && answer == "Coop")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Playing with kids?", options);
+    insert (answer);
+end
+
+rule "Playing with kids? - Yes - Mice & Mystics"
+    when
+    Answer(question == "Playing with kids?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Mice & Mystics");
+end
+
+
+rule "Playing with kids? - No - Dungeans and Dragons: Legend of Drizzt"
+    when
+    Answer(question == "Playing with kids?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dungeans and Dragons: Legend of Drizzt");
+end
+
+
+rule "Cooperative or Competitive? - Competition - do you want a campaign?"
+    when
+    Answer(question == "Cooperative or Competitive?" && answer == "Competition")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("Just one game");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "do you want a campaign?", options);
+    insert (answer);
+end
+
+rule "do you want a campaign? - Yes - Descent: Journeys in the Dark 2nd Edition"
+    when
+    Answer(question == "do you want a campaign?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Descent: Journeys in the Dark 2nd Edition");
+end
+
+
+rule "do you want a campaign? - Just one game - Dungeon Run"
+    when
+    Answer(question == "do you want a campaign?" && answer == "Just one game")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dungeon Run");
+end
+
+
+rule "Do you want a dungean crawling adventure? - No - How about managing your own dungeon?"
+    when
+    Answer(question == "Do you want a dungean crawling adventure?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about managing your own dungeon?", options);
+    insert (answer);
+end
+
+rule "How about managing your own dungeon? - Yes - Dungeon Lords"
+    when
+    Answer(question == "How about managing your own dungeon?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dungeon Lords");
+end
+
+
+rule "How about managing your own dungeon? - No - Want the whole questing thing, eh?"
+    when
+    Answer(question == "How about managing your own dungeon?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No");
+    options.add("Yes");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Want the whole questing thing, eh?", options);
+    insert (answer);
+end
+
+rule "Want the whole questing thing, eh? - No - Do you like deckbuilders?"
+    when
+    Answer(question == "Want the whole questing thing, eh?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do you like deckbuilders?", options);
+    insert (answer);
+end
+
+rule "Do you like deckbuilders? - Yes - Competitive Deck Builders?"
+    when
+    Answer(question == "Do you like deckbuilders?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Competitive");
+    options.add("Cooperative");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Competitive Deck Builders?", options);
+    insert (answer);
+end
+
+rule "Competitive Deck Builders? - Competitive - Thunderstone: Advance"
+    when
+    Answer(question == "Competitive Deck Builders?" && answer == "Competitive")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Thunderstone: Advance");
+end
+
+
+rule "Competitive Deck Builders? - Cooperative - Rune Age"
+    when
+    Answer(question == "Competitive Deck Builders?" && answer == "Cooperative")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Rune Age");
+end
+
+
+rule "Do you like deckbuilders? - No - Lord of the Rings fan?"
+    when
+    Answer(question == "Do you like deckbuilders?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Lord of the Rings fan?", options);
+    insert (answer);
+end
+
+rule "Lord of the Rings fan? - Yes - War of the Ring"
+    when
+    Answer(question == "Lord of the Rings fan?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "War of the Ring");
+end
+
+
+rule "Lord of the Rings fan? - No - How about castle defense?"
+    when
+    Answer(question == "Lord of the Rings fan?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Sounds fun!");
+    options.add("Not for me");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about castle defense?", options);
+    insert (answer);
+end
+
+rule "How about castle defense? - Sounds fun! - Cooperative or competitive?"
+    when
+    Answer(question == "How about castle defense?" && answer == "Sounds fun!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Competitive");
+    options.add("Cooperative");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Cooperative or competitive?", options);
+    insert (answer);
+end
+
+rule "Cooperative or competitive? - Competitive - Dragon Rampage"
+    when
+    Answer(question == "Cooperative or competitive?" && answer == "Competitive")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dragon Rampage");
+end
+
+
+rule "Cooperative or competitive? - Cooperative - Castle Panic"
+    when
+    Answer(question == "Cooperative or competitive?" && answer == "Cooperative")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Castle Panic");
+end
+
+
+rule "How about castle defense? - Not for me - Conquest in a fantasy world?"
+    when
+    Answer(question == "How about castle defense?" && answer == "Not for me")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Conquest in a fantasy world?", options);
+    insert (answer);
+end
+
+rule "Conquest in a fantasy world? - Yes - Epic?"
+    when
+    Answer(question == "Conquest in a fantasy world?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes! It's gotta be big");
+    options.add("No, keep it quick");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Epic?", options);
+    insert (answer);
+end
+
+rule "Epic? - Yes! It's gotta be big - Runewars"
+    when
+    Answer(question == "Epic?" && answer == "Yes! It's gotta be big")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Runewars");
+end
+
+
+rule "Epic? - No, keep it quick - Small World"
+    when
+    Answer(question == "Epic?" && answer == "No, keep it quick")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Small World");
+end
+
+
+rule "Conquest in a fantasy world? - No - everyday life, eh?"
+    when
+    Answer(question == "Conquest in a fantasy world?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Running a business");
+    options.add("Relaxing after work");
+    options.add("Annihilating your business rivals");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "everyday life, eh?", options);
+    insert (answer);
+end
+
+rule "everyday life, eh? - Running a business - Dungeon Petz"
+    when
+    Answer(question == "everyday life, eh?" && answer == "Running a business")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dungeon Petz");
+end
+
+
+rule "everyday life, eh? - Relaxing after work - Red Dragon Inn"
+    when
+    Answer(question == "everyday life, eh?" && answer == "Relaxing after work")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Red Dragon Inn");
+end
+
+
+rule "everyday life, eh? - Annihilating your business rivals - Mage Wars"
+    when
+    Answer(question == "everyday life, eh?" && answer == "Annihilating your business rivals")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Mage Wars");
+end
+
+
+rule "Want the whole questing thing, eh? - Yes - Competitive or Cooperative?"
+    when
+    Answer(question == "Want the whole questing thing, eh?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Competitive");
+    options.add("Cooperative if I can backstab");
+    options.add("Cooperative");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Competitive or Cooperative?", options);
+    insert (answer);
+end
+
+rule "Competitive or Cooperative? - Competitive - Mind getting trounced by random events?"
+    when
+    Answer(question == "Competitive or Cooperative?" && answer == "Competitive")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes. Strategy matters");
+    options.add("No, It's the experience that counts");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Mind getting trounced by random events?", options);
+    insert (answer);
+end
+
+rule "Mind getting trounced by random events? - Yes. Strategy matters - Mage Knight"
+    when
+    Answer(question == "Mind getting trounced by random events?" && answer == "Yes. Strategy matters")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Mage Knight");
+end
+
+
+rule "Mind getting trounced by random events? - No, It's the experience that counts - Is storytelling important?"
+    when
+    Answer(question == "Mind getting trounced by random events?" && answer == "No, It's the experience that counts")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("Not as much as combat!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Is storytelling important?", options);
+    insert (answer);
+end
+
+rule "Is storytelling important? - Yes - Tales of the Arabian Nights"
+    when
+    Answer(question == "Is storytelling important?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Tales of the Arabian Nights");
+end
+
+
+rule "Is storytelling important? - Not as much as combat! - Talisman"
+    when
+    Answer(question == "Is storytelling important?" && answer == "Not as much as combat!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Talisman");
+end
+
+
+rule "Competitive or Cooperative? - Cooperative if I can backstab - Shadows Over Gamelot"
+    when
+    Answer(question == "Competitive or Cooperative?" && answer == "Cooperative if I can backstab")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Shadows Over Gamelot");
+end
+
+
+rule "Competitive or Cooperative? - Cooperative - Board game or card game?"
+    when
+    Answer(question == "Competitive or Cooperative?" && answer == "Cooperative")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Boards");
+    options.add("Cards");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Board game or card game?", options);
+    insert (answer);
+end
+
+rule "Board game or card game? - Boards - Defenders of the Realm"
+    when
+    Answer(question == "Board game or card game?" && answer == "Boards")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Defenders of the Realm");
+end
+
+
+rule "Board game or card game? - Cards - Lord of the Rings Living Card Game"
+    when
+    Answer(question == "Board game or card game?" && answer == "Cards")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Lord of the Rings Living Card Game");
+end
+
+
+rule "Does theme matter to you? - No - What's most important to you?"
+    when
+    Answer(question == "Does theme matter to you?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Give me good mechanis over theme");
+    options.add("I'm playing with Non Gamers");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "What's most important to you?", options);
+    insert (answer);
+end
+
+rule "What's most important to you? - I'm playing with Non Gamers - Are they kids?"
+    when
+    Answer(question == "What's most important to you?" && answer == "I'm playing with Non Gamers")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Are they kids?", options);
+    insert (answer);
+end
+
+rule "Are they kids? - Yes - Do they like animals?"
+    when
+    Answer(question == "Are they kids?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do they like animals?", options);
+    insert (answer);
+end
+
+rule "Do they like animals? - Yes - How's their attention span?"
+    when
+    Answer(question == "Do they like animals?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Pretty long");
+    options.add("Pretty short");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How's their attention span?", options);
+    insert (answer);
+end
+
+rule "How's their attention span? - Pretty long - Zooloretto"
+    when
+    Answer(question == "How's their attention span?" && answer == "Pretty long")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Zooloretto");
+end
+
+
+rule "How's their attention span? - Pretty short - Hey! That's My Fish"
+    when
+    Answer(question == "How's their attention span?" && answer == "Pretty short")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Hey! That's My Fish");
+end
+
+
+rule "Do they like animals? - No - How about something more abstract"
+    when
+    Answer(question == "Do they like animals?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Sure");
+    options.add("No thanks..");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about something more abstract", options);
+    insert (answer);
+end
+
+rule "How about something more abstract - Sure - Anybody scared of insects?"
+    when
+    Answer(question == "How about something more abstract" && answer == "Sure")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Maybe a little..");
+    options.add("Nope!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Anybody scared of insects?", options);
+    insert (answer);
+end
+
+rule "Anybody scared of insects? - Maybe a little.. - Ingenious"
+    when
+    Answer(question == "Anybody scared of insects?" && answer == "Maybe a little..")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Ingenious");
+end
+
+
+rule "Anybody scared of insects? - Nope! - Hive"
+    when
+    Answer(question == "Anybody scared of insects?" && answer == "Nope!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Hive");
+end
+
+
+rule "How about something more abstract - No thanks.. - River Dragons"
+    when
+    Answer(question == "How about something more abstract" && answer == "No thanks..")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "River Dragons");
+end
+
+
+rule "Are they kids? - No - Do they hold grudges?"
+    when
+    Answer(question == "Are they kids?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No");
+    options.add("Yes");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do they hold grudges?", options);
+    insert (answer);
+end
+
+rule "Do they hold grudges? - No - Survive: Escape from Atlantis"
+    when
+    Answer(question == "Do they hold grudges?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Survive: Escape from Atlantis");
+end
+
+
+rule "Do they hold grudges? - Yes - Do they like trains??"
+    when
+    Answer(question == "Do they hold grudges?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No");
+    options.add("Yes");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do they like trains??", options);
+    insert (answer);
+end
+
+rule "Do they like trains?? - No - How about rolling lots of dice?"
+    when
+    Answer(question == "Do they like trains??" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Luck, be a lady!");
+    options.add("Pure strategy, please");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about rolling lots of dice?", options);
+    insert (answer);
+end
+
+rule "How about rolling lots of dice? - Luck, be a lady! - And negotation?"
+    when
+    Answer(question == "How about rolling lots of dice?" && answer == "Luck, be a lady!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("I love negotating and trading");
+    options.add("No I'd rather do my own thing");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "And negotation?", options);
+    insert (answer);
+end
+
+rule "And negotation? - I love negotating and trading - Settlers of Catan"
+    when
+    Answer(question == "And negotation?" && answer == "I love negotating and trading")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Settlers of Catan");
+end
+
+
+rule "And negotation? - No I'd rather do my own thing - Stone Age"
+    when
+    Answer(question == "And negotation?" && answer == "No I'd rather do my own thing")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Stone Age");
+end
+
+
+rule "How about rolling lots of dice? - Pure strategy, please - Carcassonne"
+    when
+    Answer(question == "How about rolling lots of dice?" && answer == "Pure strategy, please")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Carcassonne");
+end
+
+
+rule "Do they like trains?? - Yes - Ticket to Ride"
+    when
+    Answer(question == "Do they like trains??" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Ticket to Ride");
+end
+
+rule "What's most important to you? - Give me good mechanis over theme - Do you want a route or network building game?"
+    when
+    Answer(question == "What's most important to you?" && answer == "Give me good mechanis over theme")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Not really");
+    options.add("Trains & Infrastructure? Sure!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do you want a route or network building game?", options);
+    insert (answer);
+end
+
+rule "Do you want a route or network building game? - Not really - Civilization building then?"
+    when
+    Answer(question == "Do you want a route or network building game?" && answer == "Not really")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Civilization building then?", options);
+    insert (answer);
+end
+
+rule "Civilization building then? - Yes - Do you want to play with technology trees?"
+    when
+    Answer(question == "Civilization building then?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do you want to play with technology trees?", options);
+    insert (answer);
+end
+
+rule "Do you want to play with technology trees? - Yes - How complex?"
+    when
+    Answer(question == "Do you want to play with technology trees?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Pretty Complex");
+    options.add("Let's keep it simpler");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How complex?", options);
+    insert (answer);
+end
+
+rule "How complex? - Pretty Complex - Want to see your world on a map?"
+    when
+    Answer(question == "How complex?" && answer == "Pretty Complex")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Want to see your world on a map?", options);
+    insert (answer);
+end
+
+rule "Want to see your world on a map? - Yes - Sid meier's Civilization: The Board Game"
+    when
+    Answer(question == "Want to see your world on a map?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Sid meier's Civilization: The Board Game");
+end
+
+
+rule "Want to see your world on a map? - No - Through the Ages: A story of Civilization"
+    when
+    Answer(question == "Want to see your world on a map?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Through the Ages: A story of Civilization");
+end
+
+
+rule "How complex? - Let's keep it simpler - Clash of Cultures"
+    when
+    Answer(question == "How complex?" && answer == "Let's keep it simpler")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Clash of Cultures");
+end
+
+
+rule "Do you want to play with technology trees? - No - 7 Wonders"
+    when
+    Answer(question == "Do you want to play with technology trees?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "7 Wonders");
+end
+
+
+rule "Civilization building then? - No - A cooperative game?"
+    when
+    Answer(question == "Civilization building then?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Everybody's on their own");
+    options.add("Yes, completely");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "A cooperative game?", options);
+    insert (answer);
+end
+
+rule "A cooperative game? - Everybody's on their own - More than 2 players?"
+    when
+    Answer(question == "A cooperative game?" && answer == "Everybody's on their own")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "More than 2 players?", options);
+    insert (answer);
+end
+
+rule "More than 2 players? - Yes - Does it have to be new?"
+    when
+    Answer(question == "More than 2 players?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No, classics are classics for a reason");
+    options.add("Yes, we've gotten better at designing");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Does it have to be new?", options);
+    insert (answer);
+end
+
+rule "Does it have to be new? - No, classics are classics for a reason - Classic board or card game?"
+    when
+    Answer(question == "Does it have to be new?" && answer == "No, classics are classics for a reason")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Shuffling is fun!");
+    options.add("Boards are a must!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Classic board or card game?", options);
+    insert (answer);
+end
+
+rule "Classic board or card game? - Shuffling is fun! - Want to build your own deck?"
+    when
+    Answer(question == "Classic board or card game?" && answer == "Shuffling is fun!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("I'd rather build a tableau");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Want to build your own deck?", options);
+    insert (answer);
+end
+
+rule "Want to build your own deck? - Yes - Dominion"
+    when
+    Answer(question == "Want to build your own deck?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dominion");
+end
+
+
+rule "Want to build your own deck? - I'd rather build a tableau - St. Petersburg"
+    when
+    Answer(question == "Want to build your own deck?" && answer == "I'd rather build a tableau")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "St. Petersburg");
+end
+
+
+rule "Classic board or card game? - Boards are a must! - Developing on a small or grand scale?"
+    when
+    Answer(question == "Classic board or card game?" && answer == "Boards are a must!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Build me a nation!");
+    options.add("I just want my bit of land");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Developing on a small or grand scale?", options);
+    insert (answer);
+end
+
+rule "Developing on a small or grand scale? - Build me a nation! - Puerto Rico"
+    when
+    Answer(question == "Developing on a small or grand scale?" && answer == "Build me a nation!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Puerto Rico");
+end
+
+
+rule "Developing on a small or grand scale? - I just want my bit of land - Agricola"
+    when
+    Answer(question == "Developing on a small or grand scale?" && answer == "I just want my bit of land")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Agricola");
+end
+
+
+rule "Does it have to be new? - Yes, we've gotten better at designing - Maybe a new twist or worker placement?"
+    when
+    Answer(question == "Does it have to be new?" && answer == "Yes, we've gotten better at designing")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Maybe a new twist or worker placement?", options);
+    insert (answer);
+end
+
+rule "Maybe a new twist or worker placement? - Yes - Tzolk'in: The Mayan Calender"
+    when
+    Answer(question == "Maybe a new twist or worker placement?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Tzolk'in: The Mayan Calender");
+end
+
+
+rule "Maybe a new twist or worker placement? - No - Building an empire, or working magic?"
+    when
+    Answer(question == "Maybe a new twist or worker placement?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Magic!");
+    options.add("Kingdom Builder");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Building an empire, or working magic?", options);
+    insert (answer);
+end
+
+rule "Building an empire, or working magic? - Magic! - Seasons"
+    when
+    Answer(question == "Building an empire, or working magic?" && answer == "Magic!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Seasons");
+end
+
+
+rule "Building an empire, or working magic? - Kingdom Builder - Empire!"
+    when
+    Answer(question == "Building an empire, or working magic?" && answer == "Kingdom Builder")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Empire!");
+end
+
+
+rule "More than 2 players? - No - How long do you have?"
+    when
+    Answer(question == "More than 2 players?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("30 minutes or less");
+    options.add("At least an hour");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How long do you have?", options);
+    insert (answer);
+end
+
+rule "How long do you have? - 30 minutes or less - Are you an explorer or a builder?"
+    when
+    Answer(question == "How long do you have?" && answer == "30 minutes or less")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Explorer");
+    options.add("Builder");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Are you an explorer or a builder?", options);
+    insert (answer);
+end
+
+rule "Are you an explorer or a builder? - Explorer - Lost Cities"
+    when
+    Answer(question == "Are you an explorer or a builder?" && answer == "Explorer")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Lost Cities");
+end
+
+
+rule "Are you an explorer or a builder? - Builder - Agricola: All Creatures Big & Small"
+    when
+    Answer(question == "Are you an explorer or a builder?" && answer == "Builder")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Agricola: All Creatures Big & Small");
+end
+
+
+rule "How long do you have? - At least an hour - Want to rewrite history?"
+    when
+    Answer(question == "How long do you have?" && answer == "At least an hour")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No, I prefer mysteries");
+    options.add("Yes, especially the Cold War");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Want to rewrite history?", options);
+    insert (answer);
+end
+
+rule "Want to rewrite history? - No, I prefer mysteries - Mr. Jack"
+    when
+    Answer(question == "Want to rewrite history?" && answer == "No, I prefer mysteries")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Mr. Jack");
+end
+
+
+rule "Want to rewrite history? - Yes, especially the Cold War - Twilight Struggle"
+    when
+    Answer(question == "Want to rewrite history?" && answer == "Yes, especially the Cold War")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Twilight Struggle");
+end
+
+
+rule "A cooperative game? - Yes, completely - How hard do you want to make it?"
+    when
+    Answer(question == "A cooperative game?" && answer == "Yes, completely")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Easy");
+    options.add("Medium");
+    options.add("Difficult");
+    options.add("Very Difficult");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How hard do you want to make it?", options);
+    insert (answer);
+end
+
+rule "How hard do you want to make it? - Easy - Forbidden Island"
+    when
+    Answer(question == "How hard do you want to make it?" && answer == "Easy")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Forbidden Island");
+end
+
+
+rule "How hard do you want to make it? - Medium - Flash Point: Fire Rescure"
+    when
+    Answer(question == "How hard do you want to make it?" && answer == "Medium")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Flash Point: Fire Rescure");
+end
+
+
+rule "How hard do you want to make it? - Difficult - Pandemic"
+    when
+    Answer(question == "How hard do you want to make it?" && answer == "Difficult")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Pandemic");
+end
+
+
+rule "How hard do you want to make it? - Very Difficult - Ghost Stories"
+    when
+    Answer(question == "How hard do you want to make it?" && answer == "Very Difficult")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Ghost Stories");
+end
+
+
+rule "Do you want a route or network building game? - Trains & Infrastructure? Sure! - What level of complexity can your group handle"
+    when
+    Answer(question == "Do you want a route or network building game?" && answer == "Trains & Infrastructure? Sure!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Low");
+    options.add("Medium");
+    options.add("Heavy");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "What level of complexity can your group handle", options);
+    insert (answer);
+end
+
+rule "What level of complexity can your group handle - Low - Have you played Ticker To Ride?"
+    when
+    Answer(question == "What level of complexity can your group handle" && answer == "Low")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Not yet");
+    options.add("Yes. What else is out there?");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Have you played Ticker To Ride?", options);
+    insert (answer);
+end
+
+rule "Have you played Ticker To Ride? - Not yet - Ticket to Ride"
+    when
+    Answer(question == "Have you played Ticker To Ride?" && answer == "Not yet")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Ticket to Ride");
+end
+
+
+rule "Have you played Ticker To Ride? - Yes. What else is out there? - Chicago Express"
+    when
+    Answer(question == "Have you played Ticker To Ride?" && answer == "Yes. What else is out there?")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Chicago Express");
+end
+
+
+rule "What level of complexity can your group handle - Medium - Want to be able to customize difficulty?"
+    when
+    Answer(question == "What level of complexity can your group handle" && answer == "Medium")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Want to be able to customize difficulty?", options);
+    insert (answer);
+end
+
+rule "Want to be able to customize difficulty? - Yes - Steam: Rails to Riches"
+    when
+    Answer(question == "Want to be able to customize difficulty?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Steam: Rails to Riches");
+end
+
+
+rule "Want to be able to customize difficulty? - No - Thurn & Taxis"
+    when
+    Answer(question == "Want to be able to customize difficulty?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Thurn & Taxis");
+end
+
+
+rule "What level of complexity can your group handle - Heavy - Trains or infrastructure hmm?"
+    when
+    Answer(question == "What level of complexity can your group handle" && answer == "Heavy")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Infrastructure!!");
+    options.add("Trains!!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Trains or infrastructure hmm?", options);
+    insert (answer);
+end
+
+rule "Trains or infrastructure hmm? - Infrastructure!! - Power Grid"
+    when
+    Answer(question == "Trains or infrastructure hmm?" && answer == "Infrastructure!!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Power Grid");
+end
+
+
+rule "Trains or infrastructure hmm? - Trains!! - Want to play the stock market too?"
+    when
+    Answer(question == "Trains or infrastructure hmm?" && answer == "Trains!!")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Want to play the stock market too?", options);
+    insert (answer);
+end
+
+rule "Want to play the stock market too? - Yes - 18XX Series"
+    when
+    Answer(question == "Want to play the stock market too?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "18XX Series");
+end
+
+
+rule "Want to play the stock market too? - No - Crayon Rails Games"
+    when
+    Answer(question == "Want to play the stock market too?" && answer == "No")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Crayon Rails Games");
+end
+
+
+rule "I want to buy a game! - I want a Wargame - For how many players?"
+    when
+    Answer(question == "I want to buy a game!" && answer == "I want a Wargame")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("2 or more");
+    options.add("Just me");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "For how many players?", options);
+    insert (answer);
+end
+
+rule "For how many players? - 2 or more - Do you have any wargaming experience?"
+    when
+    Answer(question == "For how many players?" && answer == "2 or more")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("It's new to me");
+    options.add("Yes");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Do you have any wargaming experience?", options);
+    insert (answer);
+end
+
+rule "Do you have any wargaming experience? - It's new to me - Are you a fan of Risk?"
+    when
+    Answer(question == "Do you have any wargaming experience?" && answer == "It's new to me")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Are you a fan of Risk?", options);
+    insert (answer);
+end
+
+rule "Are you a fan of Risk? - Yes - Risk: Legacy"
+    when
+    Answer(question == "Are you a fan of Risk?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Risk: Legacy");
+end
+
+
+rule "Are you a fan of Risk? - No - World history, or high fantasy?"
+    when
+    Answer(question == "Are you a fan of Risk?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("History");
+    options.add("Fantasy");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "World history, or high fantasy?", options);
+    insert (answer);
+end
+
+rule "World history, or high fantasy? - History - Memoir '44"
+    when
+    Answer(question == "World history, or high fantasy?" && answer == "History")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Memoir '44");
+end
+
+
+rule "World history, or high fantasy? - Fantasy - Battles of Westeros"
+    when
+    Answer(question == "World history, or high fantasy?" && answer == "Fantasy")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Battles of Westeros");
+end
+
+
+rule "Do you have any wargaming experience? - Yes - Want to command Roman legions?"
+    when
+    Answer(question == "Do you have any wargaming experience?" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Want to command Roman legions?", options);
+    insert (answer);
+end
+
+rule "Want to command Roman legions? - Yes - Commands & Colors: Ancients"
+    when
+    Answer(question == "Want to command Roman legions?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Commands & Colors: Ancients");
+end
+
+
+rule "Want to command Roman legions? - No - Lead 19th Century battle lines?"
+    when
+    Answer(question == "Want to command Roman legions?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("No");
+    options.add("Yes");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Lead 19th Century battle lines?", options);
+    insert (answer);
+end
+
+rule "Lead 19th Century battle lines? - No - How about World War II"
+    when
+    Answer(question == "Lead 19th Century battle lines?" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes");
+    options.add("No");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "How about World War II", options);
+    insert (answer);
+end
+
+rule "How about World War II - Yes - Card or Dice driven combat?"
+    when
+    Answer(question == "How about World War II" && answer == "Yes")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("\"Roll roll roll\"");
+    options.add("\"Shuffle shuffle\"");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Card or Dice driven combat?", options);
+    insert (answer);
+end
+
+rule "Card or Dice driven combat? - \"Roll roll roll\" - Tide of Iron"
+    when
+    Answer(question == "Card or Dice driven combat?" && answer == "\"Roll roll roll\"")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Tide of Iron");
+end
+
+
+rule "Card or Dice driven combat? - \"Shuffle shuffle\" - Combat Commander Series"
+    when
+    Answer(question == "Card or Dice driven combat?" && answer == "\"Shuffle shuffle\"")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Combat Commander Series");
+end
+
+
+rule "How about World War II - No - Modern Warfare then?"
+    when
+    Answer(question == "How about World War II" && answer == "No")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Yes, I like immediacy");
+    options.add("No, I'm tired of real wars");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Modern Warfare then?", options);
+    insert (answer);
+end
+
+rule "Modern Warfare then? - Yes, I like immediacy - Labyrinth: The War on Terror"
+    when
+    Answer(question == "Modern Warfare then?" && answer == "Yes, I like immediacy")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Labyrinth: The War on Terror");
+end
+
+
+rule "Modern Warfare then? - No, I'm tired of real wars - Science Fiction or alternate history?"
+    when
+    Answer(question == "Modern Warfare then?" && answer == "No, I'm tired of real wars")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Alt");
+    options.add("Science Fiction");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Science Fiction or alternate history?", options);
+    insert (answer);
+end
+
+rule "Science Fiction or alternate history? - Alt - History"
+    when
+    Answer(question == "Science Fiction or alternate history?" && answer == "Alt")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Strategic");
+    options.add("Tactical");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "History", options);
+    insert (answer);
+end
+
+rule "History - Strategic - Fortress America"
+    when
+    Answer(question == "History" && answer == "Strategic")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Fortress America");
+end
+
+
+rule "History - Tactical - Dust Tactics"
+    when
+    Answer(question == "History" && answer == "Tactical")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Dust Tactics");
+end
+
+
+rule "Science Fiction or alternate history? - Science Fiction - Space ships or giant robots?"
+    when
+    Answer(question == "Science Fiction or alternate history?" && answer == "Science Fiction")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Ships!");
+    options.add("Mechs!");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "Space ships or giant robots?", options);
+    insert (answer);
+end
+
+rule "Space ships or giant robots? - Ships! - Battleship Galaxies"
+    when
+    Answer(question == "Space ships or giant robots?" && answer == "Ships!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Battleship Galaxies");
+end
+
+
+rule "Space ships or giant robots? - Mechs! - Battletech"
+    when
+    Answer(question == "Space ships or giant robots?" && answer == "Mechs!")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Battletech");
+end
+
+
+rule "Lead 19th Century battle lines? - Yes - 1812: The Invasion of Canada"
+    when
+    Answer(question == "Lead 19th Century battle lines?" && answer == "Yes")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "1812: The Invasion of Canada");
+end
+
+
+rule "For how many players? - Just me - What type?"
+    when
+    Answer(question == "For how many players?" && answer == "Just me")
+    then
+    ArrayList<String> options = new ArrayList<>();
+    options.add("Historic battles");
+    options.add("Modern air support");
+    options.add("Science Fiction");
+    Answer answer = ask(frame, kcontext.getKieRuntime(), "What type?", options);
+    insert (answer);
+end
+
+rule "What type? - Historic battles - Field Commander Series"
+    when
+    Answer(question == "What type?" && answer == "Historic battles")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Field Commander Series");
+end
+
+
+rule "What type? - Modern air support - Thunderbolt: Apache Leader"
+    when
+    Answer(question == "What type?" && answer == "Modern air support")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Thunderbolt: Apache Leader");
+end
+
+
+rule "What type? - Science Fiction - Space Inflantry"
+    when
+    Answer(question == "What type?" && answer == "Science Fiction")
+    then
+    recommend(frame, kcontext.getKieRuntime(), "Space Inflantry");
+end
